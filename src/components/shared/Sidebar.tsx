@@ -19,13 +19,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
 	return (
 		<aside className="w-72 bg-[#e0ebe0] p-6">
 			<div className="flex flex-col items-center mb-8">
-				<Avatar className="w-20 h-20 mb-2">
-					<AvatarImage src="/images/MissLi_20_south_dog.jpg" />
+				<Avatar className="w-20 h-20 mb-2 aspect-square overflow-hidden">
+					<AvatarImage src="/images/MrChen_30_single_south.jpg" className="object-cover w-full h-full object-[center_5%]" />
 					<AvatarFallback>用户</AvatarFallback>
 				</Avatar>
 				<div className="text-center">
-					<h3 className="font-medium">李小姐</h3>
-					<p className="text-sm text-gray-600">福建省福州市鼓楼区杨桥中路148号陆庄花园</p>
+					<h3 className="font-medium">陈先生</h3>
+					<p className="text-sm text-gray-600">上海市杨浦区四平路1239号</p>
 				</div>
 			</div>
 			<nav className="space-y-6">

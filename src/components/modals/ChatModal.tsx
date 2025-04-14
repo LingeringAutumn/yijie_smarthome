@@ -1,5 +1,5 @@
 // ChatModal.tsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Button from '../ui/button';
 
@@ -41,13 +41,16 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 
 	// 预设的回复映射
 	const presetResponses = {
-		"无聊": "如果您感到无聊，可以去观看有趣的电视",
+		// "无聊": "如果您感到无聊，可以去观看有趣的电视",
+		"无聊": "结合您的使用习惯，为您智能推荐智能音箱与电视",
 		"好热": "识别到现在是夏季的夜晚，建议您打开空调",
-		"睡觉": "睡觉前请关闭房间的灯光",
-		"做什么呢？":"我是您的智能家居助手！能根据您的需求智能推荐家居组件，并结合您的个人习惯与所处环境自动预测您的需求！"
+		"睡觉": "结合您的使用习惯，建议您关闭房间的灯与窗帘，并播放柔和的轻音乐",
+		"做什么呢？":"我是您的智能家居助手！能根据您的需求智能推荐家居组件，并结合您的个人习惯与所处环境自动预测您的需求！",
+		"回来": "基于您的使用习惯，鉴于您总是在回家后立刻洗澡，建议您现在就打开热水器"
 	};
 
-	// 状态管理：聊天记录和输入框内容
+	const [tvModalClosed, setTvModalClosed] = useState(false);
+	const [sleepModalSequence, setSleepModalSequence] = useState(0); // 0: 未开始, 1: 灯光, 2: 窗帘, 3: 音响
 	const [messages, setMessages] = useState([
 		{ text: "请问有什么可以帮您？", isUser: false }
 	]);
@@ -64,27 +67,52 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 		setIsHeatingModalOpen,
 		setIsFanModalOpen,
 		setIsRiceCookerModalOpen,
-		setIsWaterHeaterModalOpen
+		setIsWaterHeaterModalOpen,
+		isTVModalOpen,
+		isLightModalOpen,
+		isCurtainModalOpen
 	} = useContext(DeviceContext);
 
+	// 监听电视机控件状态变化
+	useEffect(() => {
+		if (tvModalClosed && !isTVModalOpen) {
+			setTimeout(() => {
+				setIsSpeakerModalOpen(true);
+				setTvModalClosed(false);
+			}, 300);
+		}
+	}, [isTVModalOpen, tvModalClosed, setIsSpeakerModalOpen]);
+
+	// 监听睡眠模式下的控件状态变化
+	useEffect(() => {
+		if (sleepModalSequence === 1 && !isLightModalOpen) {
+			setTimeout(() => {
+				setIsCurtainModalOpen(true);
+				setSleepModalSequence(2);
+			}, 300);
+		} else if (sleepModalSequence === 2 && !isCurtainModalOpen) {
+			setTimeout(() => {
+				setIsSpeakerModalOpen(true);
+				setSleepModalSequence(0);
+			}, 300);
+		}
+	}, [isLightModalOpen, isCurtainModalOpen, sleepModalSequence, setIsCurtainModalOpen, setIsSpeakerModalOpen]);
+
 	const handleSend = () => {
-		if (inputValue.trim() === '') return; // 如果输入为空，不发送
+		if (inputValue.trim() === '') return;
 		setMessages([...messages, { text: inputValue, isUser: true }]);
-		setInputValue(''); // 清空输入框
+		setInputValue('');
 		
-		// 添加自动回复
 		setTimeout(() => {
-			// 检查是否有预设回复
 			let response = "好的，请稍候";
-			let deviceToOpen = "";
 			
 			for (const [keyword, presetResponse] of Object.entries(presetResponses)) {
 				if (inputValue.includes(keyword)) {
 					response = presetResponse;
-					// 检查回复中是否包含设备关键词
-					if (response.includes("电视")) {
+					if (response.includes("智能音箱与电视")) {
 						setTimeout(() => {
 							setIsTVModalOpen(true);
+							setTvModalClosed(true);
 						}, 300);
 						break;
 					} else if (response.includes("冰箱")) {
@@ -92,9 +120,10 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 							setIsFridgeModalOpen(true);
 						}, 300);
 						break;
-					} else if (response.includes("灯光")) {
+					} else if (response.includes("灯与窗帘")) {
 						setTimeout(() => {
 							setIsLightModalOpen(true);
+							setSleepModalSequence(1);
 						}, 300);
 						break;
 					} else if (response.includes("空调")) {
@@ -143,14 +172,6 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 			}
 			
 			setMessages(prev => [...prev, { text: response, isUser: false }]);
-			
-			// 如果找到了要打开的设备，设置inputValue并触发对应的Modal
-			if (deviceToOpen) {
-				setTimeout(() => {
-					setInputValue(deviceToOpen);
-					handleSend();
-				}, 1000);
-			}
 		}, 700);
 	};
 
