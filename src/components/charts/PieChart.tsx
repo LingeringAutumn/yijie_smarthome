@@ -21,7 +21,7 @@ const PieChart: React.FC<PieChartProps> = ({ data }) => {
 				series: [
 					{
 						type: 'pie',
-						radius: ['60%', '85%'],
+						radius: ['60%', '80%'],
 						data,
 						label: {
 							show: true,

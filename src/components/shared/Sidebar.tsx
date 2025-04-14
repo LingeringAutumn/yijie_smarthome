@@ -20,12 +20,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
 		<aside className="w-72 bg-[#e0ebe0] p-6">
 			<div className="flex flex-col items-center mb-8">
 				<Avatar className="w-20 h-20 mb-2">
-					<AvatarImage src="/images/MrsLin_35_north.jpg" />
+					<AvatarImage src="/images/MissLi_20_south_dog.jpg" />
 					<AvatarFallback>用户</AvatarFallback>
 				</Avatar>
 				<div className="text-center">
-					<h3 className="font-medium">林女士</h3>
-					<p className="text-sm text-gray-600">北京市朝阳区机场北路3号</p>
+					<h3 className="font-medium">李小姐</h3>
+					<p className="text-sm text-gray-600">福建省福州市鼓楼区杨桥中路148号陆庄花园</p>
 				</div>
 			</div>
 			<nav className="space-y-6">

@@ -39,6 +39,14 @@ interface ChatModalProps {
 const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 	if (!isOpen) return null;
 
+	// 预设的回复映射
+	const presetResponses = {
+		"无聊": "如果您感到无聊，可以去观看有趣的电视",
+		"好热": "识别到现在是夏季的夜晚，建议您打开空调",
+		"睡觉": "睡觉前请关闭房间的灯光",
+		"做什么呢？":"我是您的智能家居助手！能根据您的需求智能推荐家居组件，并结合您的个人习惯与所处环境自动预测您的需求！"
+	};
+
 	// 状态管理：聊天记录和输入框内容
 	const [messages, setMessages] = useState([
 		{ text: "请问有什么可以帮您？", isUser: false }
@@ -63,46 +71,85 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
 		if (inputValue.trim() === '') return; // 如果输入为空，不发送
 		setMessages([...messages, { text: inputValue, isUser: true }]);
 		setInputValue(''); // 清空输入框
+		
 		// 添加自动回复
 		setTimeout(() => {
-			setMessages(prev => [...prev, { text: "好的，请稍候", isUser: false }]);
-			// 根据用户输入打开对应的 Modal
-			switch (inputValue) {
-				case "电视":
-					setIsTVModalOpen(true);
+			// 检查是否有预设回复
+			let response = "好的，请稍候";
+			let deviceToOpen = "";
+			
+			for (const [keyword, presetResponse] of Object.entries(presetResponses)) {
+				if (inputValue.includes(keyword)) {
+					response = presetResponse;
+					// 检查回复中是否包含设备关键词
+					if (response.includes("电视")) {
+						setTimeout(() => {
+							setIsTVModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("冰箱")) {
+						setTimeout(() => {
+							setIsFridgeModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("灯光")) {
+						setTimeout(() => {
+							setIsLightModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("空调")) {
+						setTimeout(() => {
+							setIsThermostatModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("智能音响")) {
+						setTimeout(() => {
+							setIsSpeakerModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("门锁")) {
+						setTimeout(() => {
+							setIsSmartLockModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("窗帘")) {
+						setTimeout(() => {
+							setIsCurtainModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("地暖")) {
+						setTimeout(() => {
+							setIsHeatingModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("电风扇")) {
+						setTimeout(() => {
+							setIsFanModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("电饭煲")) {
+						setTimeout(() => {
+							setIsRiceCookerModalOpen(true);
+						}, 300);
+						break;
+					} else if (response.includes("热水器")) {
+						setTimeout(() => {
+							setIsWaterHeaterModalOpen(true);
+						}, 300);
+						break;
+					}
 					break;
-				case "冰箱":
-					setIsFridgeModalOpen(true);
-					break;
-				case "灯光":
-					setIsLightModalOpen(true);
-					break;
-				case "恒温器":
-					setIsThermostatModalOpen(true);
-					break;
-				case "智能音响":
-					setIsSpeakerModalOpen(true);
-					break;
-				case "智能门锁":
-					setIsSmartLockModalOpen(true);
-					break;
-				case "窗帘":
-					setIsCurtainModalOpen(true);
-					break;
-				case "地暖":
-					setIsHeatingModalOpen(true);
-					break;
-				case "电风扇":
-					setIsFanModalOpen(true);
-					break;
-				case "电饭煲":
-					setIsRiceCookerModalOpen(true);
-					break;
-				case "热水器":
-					setIsWaterHeaterModalOpen(true);
-					break;
-				default:
-					console.log(`未找到对应的设备：${inputValue}`);
+				}
+			}
+			
+			setMessages(prev => [...prev, { text: response, isUser: false }]);
+			
+			// 如果找到了要打开的设备，设置inputValue并触发对应的Modal
+			if (deviceToOpen) {
+				setTimeout(() => {
+					setInputValue(deviceToOpen);
+					handleSend();
+				}, 1000);
 			}
 		}, 700);
 	};
